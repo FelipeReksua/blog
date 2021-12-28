@@ -2,8 +2,8 @@
 
 namespace controller;
 
-require 'controller/db.php';
-use controller\Db as Db;
+require 'model/db.php';
+use model\Db as Db;
 
 class Front
 {
@@ -11,30 +11,24 @@ class Front
     {
         session_start();
 
-    	if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    		$user['id'] = $_SESSION["user_id"];
-    		$user['name'] = $_SESSION["user_name"];
-    		$user['email'] = $_SESSION["user_email"];
-    		return $user;
+    	if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    	   return null;
 		}
-    	return null;
+
+        $email = $_SESSION["user_email"];
+		$sql = "SELECT * FROM customer WHERE email = ?";
+
+        $user = Db::query($sql, [$email]);
+
+		return $user ? $user[0] : null;
     }
     
     public static function home()
     {
         $sql = "SELECT * FROM post LIMIT 10";
-        // $db = new Db();
-    	$pdo = Db::connect();
-        // $pdo = $db->connect();
-        $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $sth = $pdo->prepare($sql);
-        $sth->execute();
 
-        $posts = $sth->fetchAll(\PDO::FETCH_ASSOC);
+        $posts = Db::query($sql, []);
         $user = Front::getUser();
-
-        Db::disconnect();
 
         require 'view/index.php';
     }
@@ -43,5 +37,11 @@ class Front
     {
         $user = Front::getUser();
         require 'view/my-account.php';
+    }
+
+    public static function createPost()
+    {
+        $user = Front::getUser();
+        require 'view/create-post.html';
     }
 }

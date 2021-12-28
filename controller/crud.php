@@ -2,7 +2,7 @@
 
 namespace controller;
 
-use controller\Db as Db;
+use model\Db as Db;
 
 class Crud
 {
@@ -34,10 +34,9 @@ class Crud
                 }
             }
 
-
             if ($validation) {
                 $pdo = Db::connect();
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 $sql = "UPDATE customer SET name = ? WHERE id = ?";
                 $q = $pdo->prepare($sql);
                 $q->execute(array($name, $id));
@@ -49,7 +48,7 @@ class Crud
                 }
 
                 Db::disconnect();
-                header("Location: /login");
+                header("Location: /minha-conta");
             }
         }
     }
@@ -89,7 +88,7 @@ class Crud
 
             if ($validation) {
                 $pdo = Db::connect();
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 $sql = "INSERT INTO customer (name, email, password) VALUES(?,?,?)";
                 $q = $pdo->prepare($sql);
                 $q->execute(array($name, $email, $password));

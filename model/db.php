@@ -1,21 +1,16 @@
 <?php
 
-namespace controller;
+namespace model;
 
 class Db
 {
     private static $dbname = 'blog';
     private static $dbhost = 'localhost';
-    private static $dbuser = 'reksua';
-    private static $dbpass = 'Proxys2020@!';
+    private static $dbuser = '';
+    private static $dbpass = '';
     
     private static $conn = null;
 
-    
-    // public function __construct() 
-    // {
-    //     die('Init function error.');
-    // }
 
     public static function mysqliconnect()
     {
@@ -37,5 +32,22 @@ class Db
     public static function disconnect()
     {
         self::$conn = null;
+    }
+
+    public static function query($sql = null, $params = [])
+    {
+        if (!$sql) {
+            return null;
+        }
+        
+        $pdo = Db::connect();
+        $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $sth = $pdo->prepare($sql);
+        $sth->execute($params);
+
+        Db::disconnect();
+
+        return $sth->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
